@@ -1,11 +1,17 @@
 import subprocess
 import re
+import os
+import time
 
-
-
+# THIS CODE WORK IN SCRPY
+# use f"{adb_path}
+python_path = os.path.abspath(__file__)
+adb_path = os.path.join(os.path.dirname(python_path), "../adb.exe")
+adb_path = os.path.abspath(adb_path)
+print("ADB: ",adb_path)
 
 def get_adb_devices_id():
-    result = subprocess.run(['adb', 'devices'], stdout=subprocess.PIPE)
+    result = subprocess.run([f"{adb_path}", 'devices'], stdout=subprocess.PIPE)
     lines = result.stdout.decode('utf-8').strip().split('\n')
     devices = [line.split()[0] for line in lines[1:] if 'device' in line]
     return devices
@@ -31,7 +37,7 @@ print (array)
 
 def print_adb_devices_id():
     print ("Connected devices:")
-    result = subprocess.run(['adb', 'devices'], stdout=subprocess.PIPE)
+    result = subprocess.run([f"{adb_path}", 'devices'], stdout=subprocess.PIPE)
     print(result.stdout.decode('utf-8').strip())
 
 def close_all_connections(array):
@@ -39,7 +45,7 @@ def close_all_connections(array):
         print("No devices to disconnect.")
         return
     target = array[0]
-    adb_s = f"adb -s {target} "
+    adb_s = f"{adb_path} -s {target} "
     disconnect_cmd = adb_s + "disconnect"
     print(subprocess.run(disconnect_cmd.split(), stdout=subprocess.PIPE).stdout.decode('utf-8').strip())
     
@@ -50,3 +56,14 @@ close_all_connections(array)
 print_adb_devices_id()    
 
 
+
+def countdown_timer(seconds):
+    while seconds:
+        mins, secs = divmod(seconds, 60)
+        timeformat = '{:02d}:{:02d}'.format(mins, secs)
+        print(timeformat, end='\r')
+        time.sleep(1)
+        seconds -= 1
+    print('00:00')
+
+countdown_timer(10)

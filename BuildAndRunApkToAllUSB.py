@@ -2,6 +2,19 @@ import os
 import time
 
 
+# replace by the path on your computer
+aapt_path = "C:\\Users\\elab\\AppData\\Local\\Android\\Sdk\\build-tools\\30.0.2\\aapt.exe"
+
+
+
+# THIS CODE WORK IN SCRPY
+python_path = os.path.abspath(__file__)
+adb_path = os.path.join(os.path.dirname(python_path), "../adb.exe")
+adb_path = os.path.abspath(adb_path)
+print("ADB: ",adb_path)
+
+
+
 package_name = "be.elab.ntpintpigame"
 
 
@@ -29,10 +42,21 @@ string_path_of_apk = apk_files[0]
 for apk in apk_files:
     string_path_of_apk=apk
     print(apk)
+
+
+if os.path.exists(aapt_path):
+    package_name_previous=package_name
+    package_name=""
+    command = f"{aapt_path} dump badging {string_path_of_apk} | findstr package"
+    result = os.popen(command).read()
+    if result:
+        package_name = result.split("name='")[1].split("'")[0]
+        print("Package name found:", package_name)
     
+
     
 def list_connected_devices():
-    result = os.popen("adb devices").read()
+    result = os.popen(f"{adb_path} devices").read()
     lines = result.strip().split('\n')
     devices = [line.split()[0] for line in lines[1:] if 'device' in line]
     return devices
@@ -42,9 +66,9 @@ print("Connected devices:", connected_devices)
 
 
 def install_and_launch_apk_on_device(apk_path, device_id, package_name):
-    display_phone_info = f"adb -s {device_id} shell getprop ro.product.model\nadb -s {device_id} shell getprop ro.build.version.release\nadb -s {device_id} shell getprop ro.build.version.sdk\n"
-    install_command = f"adb -s {device_id} install -r {apk_path}"
-    play_command = f"adb -s {device_id} shell monkey -p {package_name} -c android.intent.category.LAUNCHER 1"
+    display_phone_info = f"{adb_path} -s {device_id} shell getprop ro.product.model\n{adb_path} -s {device_id} shell getprop ro.build.version.release\n{adb_path}  -s {device_id} shell getprop ro.build.version.sdk\n"
+    install_command = f"{adb_path} -s {device_id} install -r {apk_path}"
+    play_command = f"{adb_path} -s {device_id} shell monkey -p {package_name} -c android.intent.category.LAUNCHER 1"
     return f"{display_phone_info}\n\n{install_command}\n\n{play_command}\n\n"
 
 string_clipboard_commands= ""
@@ -60,7 +84,16 @@ for line in string_clipboard_commands.split('\n'):
     
 
     
-    
+def countdown_timer(seconds):
+    while seconds:
+        mins, secs = divmod(seconds, 60)
+        timeformat = '{:02d}:{:02d}'.format(mins, secs)
+        print(timeformat, end='\r')
+        time.sleep(1)
+        seconds -= 1
+    print('00:00')
+
+countdown_timer(10)
     
     
     

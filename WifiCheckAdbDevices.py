@@ -2,10 +2,18 @@ import subprocess
 import re
 
 
+import os
+import time
+# THIS CODE WORK IN SCRPY
+# use f"{adb_path}
+python_path = os.path.abspath(__file__)
+adb_path = os.path.join(os.path.dirname(python_path), "../adb.exe")
+adb_path = os.path.abspath(adb_path)
+print("ADB: ",adb_path)
 
 
 def get_adb_devices_id():
-    result = subprocess.run(['adb', 'devices'], stdout=subprocess.PIPE)
+    result = subprocess.run([f"{adb_path}", 'devices'], stdout=subprocess.PIPE)
     lines = result.stdout.decode('utf-8').strip().split('\n')
     devices = [line.split()[0] for line in lines[1:] if 'device' in line]
     return devices
@@ -30,12 +38,12 @@ print (array)
 
 
 def get_info_device_ipv4(target):
-    adb_s = f"adb -s {target} "
+    adb_s = f"{adb_path} -s {target} "
     serial_number_cmd = adb_s + "shell getprop ro.serialno"
     model_cmd = adb_s + "shell getprop ro.product.model"
     release_cmd = adb_s + "shell getprop ro.build.version.release"
     sdk_cmd = adb_s + "shell getprop ro.build.version.sdk"
-    adb_s_device_id = f"adb -s {target} "
+    adb_s_device_id = f"{adb_path} -s {target} "
     
     
     serial_number= subprocess.run(serial_number_cmd.split(), stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
@@ -48,7 +56,7 @@ def get_info_device_ipv4(target):
 
 
 def get_full_description_of_devices(target):
-    adb_s = f"adb -s {target} shell getprop"
+    adb_s = f"{adb_path} -s {target} shell getprop"
     print ("\n\n\n")
     print ("TARGET: ", target)
     
@@ -72,3 +80,13 @@ if bool_use_full_description:
 
 
 
+def countdown_timer(seconds):
+    while seconds:
+        mins, secs = divmod(seconds, 60)
+        timeformat = '{:02d}:{:02d}'.format(mins, secs)
+        print(timeformat, end='\r')
+        time.sleep(1)
+        seconds -= 1
+    print('00:00')
+
+countdown_timer(10)
