@@ -5,9 +5,15 @@ import time
 package_name = "be.elab.ntpintpigame"
 
 
-print("Current script path:", os.path.abspath(__file__))
-string_path_script_root = os.path.dirname(os.path.abspath(__file__))
+string_python_script_path = os.path.abspath(__file__)
+string_folder_script_root = os.path.dirname(string_python_script_path)
+print("Current script path:", string_python_script_path)
+string_path_script_root = string_folder_script_root
 
+string_build_folder= os.path.join(string_path_script_root, "build")
+print("Build folder path:", string_build_folder)
+if not os.path.exists(string_build_folder):
+    os.makedirs(string_build_folder)
 
 
 def find_apks_in_build_folder(build_folder_path):
