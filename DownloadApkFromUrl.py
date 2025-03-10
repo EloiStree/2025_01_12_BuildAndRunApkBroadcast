@@ -2,19 +2,31 @@ import os
 import sys
 import requests
 
+# pip install gdown
+import gdown
+
 
 path_file_containing_download_link = os.path.join(os.path.dirname(os.path.abspath(__file__)), "download_apk_link.txt")
 
 def download_apk(url, save_path):
-    response = requests.get(url, stream=True)
-    if response.status_code == 200:
-        with open(save_path, 'wb') as file:
-            for chunk in response.iter_content(chunk_size=1024):
-                if chunk:
-                    file.write(chunk)
+    if "drive.google.com" in url:
+        file_id = url.split('/')[-2]
+        print (f"File ID: {file_id}")
+        url = f"https://drive.google.com/uc?id={file_id}"
+        print ("Downloading from Google Drive")
+        gdown.download(url, save_path, quiet=False)
         print(f"APK downloaded successfully and saved to {save_path}")
-    else:
-        print(f"Failed to download APK. Status code: {response.status_code}")
+    else :
+        print ("Downloading from URL")
+        response = requests.get(url, stream=True)
+        if response.status_code == 200:
+            with open(save_path, 'wb') as file:
+                for chunk in response.iter_content(chunk_size=1024):
+                    if chunk:
+                        file.write(chunk)
+            print(f"APK downloaded successfully and saved to {save_path}")
+        else:
+            print(f"Failed to download APK. Status code: {response.status_code}")
 
 def main():
     
