@@ -8,3 +8,8 @@ Since I needed to develop a multiplayer game for all of them, I created some too
 
 Below, you'll find Python scripts to broadcast actions and retrieve files efficiently.  
 ![image](https://github.com/user-attachments/assets/6ae8d2d0-b56d-49f9-91bf-083ccfad0599)
+
+
+
+- https://github.com/Genymobile/scrcpy
+- https://brave-software-brave.en.uptodown.com/android
