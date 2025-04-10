@@ -48,14 +48,7 @@ while True:
     
 
 
-    path_namespace_apk_to_install = os.path.join(os.path.dirname(python_path), "set_apk_namespace.txt")
-    if not os.path.exists(path_namespace_apk_to_install):
-        with open(path_namespace_apk_to_install, "w") as f:
-            f.write("com.UnityTechnologies.com.unity.template.urpblank")
-
-    with open(path_namespace_apk_to_install) as f:
-        package_name = f.read().strip()
-        print("Package name:", package_name)
+    
 
 
 
@@ -71,12 +64,6 @@ while True:
     if not os.path.exists(string_build_folder):
         os.makedirs(string_build_folder)
 
-
-    apk_files = find_apks_in_build_folder(string_path_script_root)
-    string_path_of_apk = apk_files[0]
-    for apk in apk_files:
-        string_path_of_apk=apk
-        print(apk)
 
 
     # if os.path.exists(aapt_path):
@@ -96,6 +83,11 @@ while True:
     while True:
         bool_new_files = False
         current_files = list_files(string_build_folder)
+
+        if current_files == None or len(current_files) == 0:
+            print("No files found.")
+            time.sleep(5)
+            continue
 
         if previous_list_files is None:
             # First run
@@ -117,13 +109,37 @@ while True:
         if not bool_new_files:
             print("No new files.")
 
+        
+
         if bool_new_files:
 
-            
+            path_namespace_apk_to_install = os.path.join(os.path.dirname(python_path), "build/set_apk_namespace.txt")
+            if not os.path.exists(path_namespace_apk_to_install):
+                with open(path_namespace_apk_to_install, "w") as f:
+                    f.write("com.UnityTechnologies.com.unity.template.urpblank")
+
+
+            with open(path_namespace_apk_to_install) as f:
+                package_name = f.read().strip()
+                print("Package name:", package_name)
+
+            apk_files = find_apks_in_build_folder(string_path_script_root)
+
+            string_path_of_apk = apk_files[0]
+            for apk in apk_files:
+                string_path_of_apk=apk
+                print(apk)
+
+            if ".apk" in string_path_of_apk:
+                parts = string_path_of_apk.replace(".apk", "").strip().split(os.sep)
+                if len(parts) > 1 and "." in parts[-1]:
+                    package_name = parts[-1]
+                else:
+                    package_name = string_path_of_apk.split("/")[-1].split("\\")[-1].replace(".apk", "")
+
 
             connected_devices = list_connected_devices()
             print("Connected devices:", connected_devices)
-
             def uninstall_apk_on_device(device_id, package_name):
                 return f"{adb_path} -s {device_id} uninstall {package_name}\n"
 
