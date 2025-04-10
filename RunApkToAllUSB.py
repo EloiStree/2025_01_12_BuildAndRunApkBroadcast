@@ -2,8 +2,13 @@ import os
 import time
 
 
+# RTFM HOW TO USE:
+# https://github.com/EloiStree/2025_01_07_PitchDeckNtpIntPiGame/blob/main/Documentation/ScrcpyToRunAll.md
+
+
 # replace by the path on your computer
 aapt_path = "C:\\Users\\elab\\AppData\\Local\\Android\\Sdk\\build-tools\\30.0.2\\aapt.exe"
+
 
 
 
@@ -15,10 +20,19 @@ print("ADB: ",adb_path)
 
 
 
-
-
-package_name = "be.elab.ntpintpigame"
 package_name= "com.UnityTechnologies.com.unity.template.urpblank"
+
+path_namespace_apk_to_install = os.path.join(os.path.dirname(python_path), "set_apk_namespace.txt")
+if not os.path.exists(path_namespace_apk_to_install):
+    with open(path_namespace_apk_to_install, "w") as f:
+        f.write("com.UnityTechnologies.com.unity.template.urpblank")
+
+with open(path_namespace_apk_to_install) as f:
+    package_name = f.read().strip()
+    print("Package name:", package_name)
+
+
+
 
 
 string_python_script_path = os.path.abspath(__file__)
@@ -47,18 +61,6 @@ for apk in apk_files:
     print(apk)
 
 
-# if os.path.exists(aapt_path):
-#     package_name_previous=package_name
-#     package_name=""
-#     command = f"{aapt_path} dump badging {string_path_of_apk} | findstr package"
-#     result = os.popen(command).read()
-#     if result:
-#         package_name = result.split("name='")[1].split("'")[0]
-#         print("Package name found:", package_name)
-    
-
-
-
     
 def list_connected_devices():
     result = os.popen(f"{adb_path} devices").read()
@@ -69,22 +71,22 @@ def list_connected_devices():
 connected_devices = list_connected_devices()
 print("Connected devices:", connected_devices)
 
-def uninstall_apk_on_device(device_id, package_name):
-    return f"{adb_path} -s {device_id} uninstall {package_name}\n"
+def stop_apk_on_device(device_id, package_name):
+    return f"{adb_path} -s {device_id} shell am force-stop {package_name}"
 
-def install_and_launch_apk_on_device(apk_path, device_id, package_name):
+def launch_apk(apk_path, device_id, package_name):
     display_phone_info = f"{adb_path} -s {device_id} shell getprop ro.product.model\n{adb_path} -s {device_id} shell getprop ro.build.version.release\n{adb_path}  -s {device_id} shell getprop ro.build.version.sdk\n"
-    install_command = f"{adb_path} -s {device_id} install -r {apk_path}"
     play_command = f"{adb_path} -s {device_id} shell monkey -p {package_name} -c android.intent.category.LAUNCHER 1"
-    return f"{display_phone_info}\n\n{install_command}\n\n{play_command}\n\n"
+    return f"{display_phone_info}\n\n{play_command}\n\n"
 
 string_clipboard_commands= ""
 
-for device in connected_devices:
-    string_clipboard_commands+=uninstall_apk_on_device(device, package_name)
+for device_id in connected_devices:
+    string_clipboard_commands += stop_apk_on_device(device_id, package_name)
 
-for device in connected_devices:
-    string_clipboard_commands+=install_and_launch_apk_on_device(string_path_of_apk, device, package_name)
+# add some waiting time
+for device_id in connected_devices:
+    string_clipboard_commands += launch_apk(string_path_of_apk, device_id, package_name)
 
 print(string_clipboard_commands)
 for line in string_clipboard_commands.split('\n'):
